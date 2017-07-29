@@ -1,6 +1,6 @@
 # async-queue-js
 A generic async queue with a single dependency on bluebird  
-It's very useful for making transactions to API's that don't support simultaneous requests  
+It's very useful for making transactions to APIs that don't support simultaneous requests  
 
 # Installation
 #### npm 
