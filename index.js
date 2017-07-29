@@ -3,12 +3,13 @@ Promise.config({
   cancellation: true
 })
 
-function AsyncQueue () {
-  this._queue = Array.isArray(arguments[0]) ? arguments[0] : []
+function AsyncQueue (options) {
+  this._queue = []
   this.options = {timeout: 60000}
-  var passedOptions = (this._queue.length || arguments[1] ? arguments[1] : arguments[0]) || []
-  for (var key in passedOptions) {
-    this.options[key] = passedOptions[key]
+  if (options) {
+    for (var key in options) {
+      this.options[key] = options[key]
+    }
   }
 
   this.enqueue = enqueue.bind(this)
