@@ -64,12 +64,8 @@ describe('Async Queue', function () {
   })
 
   it('Should call dequeue event', function (done) {
-    var calls = 0
     queue.on('dequeue', function () {
-      calls++
-      if (calls < 2) {
-        done()
-      }
+      done()
     })
     queue.enqueue(function () {})
   })
