@@ -148,7 +148,7 @@ describe('Async Queue', function () {
       }
     }
     var repetitions = 0
-    for (var i = 0; i < Math.random() * 10; i++) {
+    for (var i = 0; i < 10; i++) {
       queue.enqueue(asyncOperation(i))
     }
 
@@ -158,7 +158,7 @@ describe('Async Queue', function () {
       }
 
       repetitions++
-      for (var i = 0; i < Math.random() * 10; i++) {
+      for (var i = 0; i < 10; i++) {
         queue.enqueue(asyncOperation(i))
       }
     })
