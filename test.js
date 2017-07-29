@@ -5,6 +5,7 @@ Promise.config({
 
 var chai = require('chai')
 var assert = chai.assert
+var expect = chai.expect
 
 var AsyncQueue = require('./index')
 var queue
@@ -21,16 +22,10 @@ describe('Async Queue', function () {
     assert.equal(queue.length, 2)
   })
 
-  it('Should throw error that element is not a function', function (done) {
+  it('Should throw error that element is not a function', function () {
     var el = 'Not a function'
-    queue.enqueue(el)
-      .then(function () {
-        done(new Error('Expected rejection'))
-      })
-      .catch(function (err) {
-        assert.isDefined(err)
-        done()
-      })
+    function enqueue () { queue.enqueue(el) }
+    expect(enqueue).to.throw()
   })
 
   it('Should have correct length', function (done) {
@@ -104,7 +99,6 @@ describe('Async Queue', function () {
   it('Should execute enqueued functions in correct order and resolve correct results', function (done) {
     var el = function (i) { return function () { return i } }
     var responses = []
-    queue.start()
     for (var i = 0; i < 3; i++) {
       queue.enqueue(el(i))
         .then(function (res) {
@@ -163,4 +157,30 @@ describe('Async Queue', function () {
       }
     })
   })
+  it('Should handle thousands of pending operations', function (done) {
+    function asyncOperation (i) {
+      return function () {
+        return new Promise(function (resolve) {
+          return resolve(i)
+        })
+      }
+    }
+
+    var expected = Array.apply(null, {length: 10000})
+                  .map(Number.call, Number)
+    var results = []
+    queue.stop()
+    for (var idx in expected) {
+      queue.enqueue(asyncOperation(expected[idx]))
+      .then(function (res) {
+        results.push(res)
+      })
+    }
+    queue.start()
+
+    queue.on('empty', function () {
+      assert.deepEqual(results, expected)
+      done()
+    })
+  }).timeout(5000)
 })
