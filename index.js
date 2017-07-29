@@ -50,10 +50,6 @@ function dequeue () {
   var that = this
   var func = that._queue[0]
 
-  if (func && that.dequeueEvent) {
-    that.dequeueEvent(func, that)
-  }
-
   if (func && func.pending) {
     func.pending = false
     Promise.resolve(func())
@@ -75,6 +71,10 @@ function dequeue () {
         that._dequeue()
       }
     })
+
+    if (that.dequeueEvent) {
+      that.dequeueEvent(func, that)
+    }
   }
 }
 
