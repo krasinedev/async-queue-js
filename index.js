@@ -25,17 +25,18 @@ function enqueue (func) {
     that.enqueueEvent(func, that)
   }
 
-  return new Promise(function (resolve, reject) {
-    if (typeof func !== 'function') {
-      return reject(new Error('AsyncQueue accepts only functions'))
-    }
+  if (typeof func !== 'function') {
+    throw new Error('AsyncQueue accepts only functions')
+  }
 
+  that._queue.push(func)
+  that.length = that._queue.length
+
+  return new Promise(function (resolve, reject) {
     func.resolve = resolve
     func.reject = reject
     func.pending = true
 
-    that._queue.push(func)
-    that.length = that._queue.length
     that._dequeue()
   })
 }
@@ -48,8 +49,8 @@ function dequeue () {
   var that = this
   var func = that._queue[0]
 
-  if (this.dequeueEvent) {
-    this.dequeueEvent(func, that)
+  if (func && that.dequeueEvent) {
+    that.dequeueEvent(func, that)
   }
 
   if (func && func.pending) {
@@ -59,17 +60,20 @@ function dequeue () {
     .then(function (res) {
       that._queue.shift()
       that.length = that._queue.length
-      that._dequeue()
-      func.resolve(res)
+      return func.resolve(res)
     })
     .catch(function (err) {
       that._queue.shift()
       that.length = that._queue.length
-      that._dequeue()
-      func.reject(err)
+      return func.reject(err)
     })
-  } else if (!func && that.emptyEvent) {
-    that.emptyEvent(that)
+    .finally(function () {
+      if (!that.length && that.emptyEvent) {
+        that.emptyEvent()
+      } else if (that.length) {
+        that._dequeue()
+      }
+    })
   }
 }
 
