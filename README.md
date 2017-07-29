@@ -8,7 +8,7 @@ It's very useful for making transactions to API's that don't support simultaneou
 #### yarn
 `yarn add async-queue-js`
 
-# Example Usage
+# Examples
 #### Creating a queue
 ```javascript
 const AsyncQueue = require('async-queue-js')
@@ -60,7 +60,7 @@ queue.enqueue(asyncOperation)
 ```
 Functions are automatically promisified
 
-#### A more realistic usage
+#### A more realistic use case
 This example uses an express instance and assumes that it is already up and running  
 *transact returns a function which makes a payment to some provider that accepts only one request at a time
 ```javascript
@@ -93,7 +93,7 @@ Once you call
 ```javascript
 queue.start()
 ```
-It will continue
+The queue will continue the drain
 
 ### Events
 ```javascript
