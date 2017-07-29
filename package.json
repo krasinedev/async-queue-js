@@ -1,0 +1,30 @@
+{
+  "name": "async-queue",
+  "version": "1.0.0",
+  "description": "Simple and easy to use async queue",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "KN",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "3.5.0"
+  },
+  "devDependencies": {
+    "chai": "4.1.0",
+    "mocha": "3.4.2"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "context",
+      "before",
+      "beforeEach",
+      "after",
+      "afterEach",
+      "it",
+      "expect"
+    ]
+  }
+}
