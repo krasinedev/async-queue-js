@@ -46,7 +46,21 @@ queue.enqueue(asyncOperation)
 Once an operation is enqueued its execution starts immediately  
 Any subsequent enqueued operations wait for its completion in order to start
 
-You can register handlers to the enqueue method
+#### Passing arguments to enqueue
+```javascript
+const queue = new AsyncQueue()
+
+function asyncOperation(arg1, arg2, arg3) {
+  console.log(arg1, arg2, arg3) // 'Cats are awesome'
+}
+
+queue.enqueue(asyncOperation, 'Cats', 'are', 'awesome')
+```
+First argument is always the function that will be executed  
+The rest of the arguments will be passed to that function 
+
+#### Registering handlers
+Handlers can only be registered on the enqueue method
 ```javascript
 queue.enqueue(asyncOperation)
 .then(res => {
@@ -59,10 +73,8 @@ queue.enqueue(asyncOperation)
 })
 ```
 Functions are automatically promisified
-
 #### A more realistic use case
 This example uses an express instance and assumes that it is already up and running  
-*transact returns a function which makes a payment to some provider that accepts only one request at a time
 ```javascript
 const app = require('./app')
 
@@ -73,7 +85,7 @@ const transact = require('./transact')
 
 app.post('/transact', (req, res) => {
   // validate the request
-  queue.enqueue(transact(req.body))
+  queue.enqueue(transact, req.body)
   .then(resp => {
     return res.json({message: 'Your payment was successful', amount: resp.amount})
   })
