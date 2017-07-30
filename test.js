@@ -15,8 +15,9 @@ describe('Async Queue', function () {
     queue = new AsyncQueue()
   })
 
-  it('Should add element to queue', function () {
+  it('Should add elements to queue', function () {
     var el = function () {}
+    queue.stop()
     queue.enqueue(el)
     queue.enqueue(el)
     assert.equal(queue.length, 2)
@@ -29,7 +30,7 @@ describe('Async Queue', function () {
   })
 
   it('Should have correct length', function (done) {
-    var el = function () { return 5 }
+    var el = function () {}
     queue.enqueue(el)
     queue.enqueue(el)
     queue.enqueue(el)
@@ -153,6 +154,7 @@ describe('Async Queue', function () {
       }
     })
   })
+
   it('Should handle thousands of pending operations', function (done) {
     function asyncOperation (i) {
       return function () {
@@ -178,5 +180,14 @@ describe('Async Queue', function () {
       assert.deepEqual(results, expected)
       done()
     })
-  }).timeout(5000)
+  }).timeout(20000)
+
+  it('Should call function with passed arguments', function (done) {
+    function asyncOperation (a, b, c, d, e) {
+      assert.deepEqual([a, b, c, d, e], [1, 2, 3, 4, 5])
+      done()
+    }
+
+    queue.enqueue(asyncOperation, 1, 2, 3, 4, 5)
+  })
 })
