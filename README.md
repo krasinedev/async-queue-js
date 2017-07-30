@@ -21,15 +21,15 @@ const AsyncQueue = require('async-queue-js')
 const queue = new AsyncQueue({timeout: 10000})
 ```
 The timeout will be applied to each separate operation in the queue  
-#### Enqueuing a function
+#### Enqueuing a non async function
 ```javascript
 const queue = new AsyncQueue()
 
-function simple() {
+function nonAsync() {
   return 'Just a normal function'
 }
 
-queue.enqueue(simple)
+queue.enqueue(nonAsync)
 ```
 #### Enqueuing an async function
 ```javascript
@@ -46,21 +46,20 @@ queue.enqueue(asyncOperation)
 Once an operation is enqueued its execution starts immediately  
 Any subsequent enqueued operations wait for its completion in order to start
 
-#### Passing arguments to enqueue
+#### Passing arguments
+First argument is always the function that will be executed  
+The rest of the arguments will be passed to that function
 ```javascript
 const queue = new AsyncQueue()
 
-function asyncOperation(arg1, arg2, arg3) {
+function praiseCats(arg1, arg2, arg3) {
   console.log(arg1, arg2, arg3) // 'Cats are awesome'
 }
 
-queue.enqueue(asyncOperation, 'Cats', 'are', 'awesome')
+queue.enqueue(praiseCats, 'Cats', 'are', 'awesome')
 ```
-First argument is always the function that will be executed  
-The rest of the arguments will be passed to that function 
-
 #### Registering handlers
-Handlers can only be registered on the enqueue method
+Handlers can be registered on the enqueue method
 ```javascript
 queue.enqueue(asyncOperation)
 .then(res => {
@@ -94,6 +93,7 @@ app.post('/transact', (req, res) => {
   })
 })
 ```
+Note: transact makes a request to a third party provider which requires transactions to be made 1 by 1
 ### Start/stop the continuous drain
 To stop the continuous drain
 ```javascript
