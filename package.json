@@ -25,6 +25,7 @@
       "afterEach",
       "it",
       "expect"
-    ]
+    ],
+    "url" : "https://github.com/KrasiNedew/async-queue-js"
   }
 }
