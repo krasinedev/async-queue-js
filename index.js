@@ -30,51 +30,55 @@ function enqueue (func) {
     throw new Error('AsyncQueue accepts only functions')
   }
 
-  that._queue.push(func)
+  var args = Array.prototype.slice.call(arguments, 1)
+  var funcWrap = function () {
+    return func.apply(func, args)
+  }
+
+  that._queue.push(funcWrap)
   that.length = that._queue.length
 
   return new Promise(function (resolve, reject) {
-    func.resolve = resolve
-    func.reject = reject
-    func.pending = true
-
+    funcWrap.resolve = resolve
+    funcWrap.reject = reject
     that._dequeue()
   })
 }
 
 function dequeue () {
-  if (this._stopped) {
+  if (this._stopped || this._processing) {
     return
   }
 
+  var funcWrap = this._queue[0]
+  if (!funcWrap) {
+    return
+  }
+
+  this._processing = true
+  this._queue.shift()
+  this.length = this._queue.length
+
   var that = this
-  var func = that._queue[0]
-
-  if (func && func.pending) {
-    func.pending = false
-    Promise.resolve(func())
-    .timeout(that.options.timeout)
-    .then(function (res) {
-      that._queue.shift()
-      that.length = that._queue.length
-      return func.resolve(res)
-    })
-    .catch(function (err) {
-      that._queue.shift()
-      that.length = that._queue.length
-      return func.reject(err)
-    })
-    .finally(function () {
-      if (!that.length && that.emptyEvent) {
-        that.emptyEvent()
-      } else if (that.length) {
-        that._dequeue()
-      }
-    })
-
-    if (that.dequeueEvent) {
-      that.dequeueEvent(func, that)
+  Promise.resolve(funcWrap())
+  .timeout(that.options.timeout)
+  .then(function (res) {
+    return funcWrap.resolve(res)
+  })
+  .catch(function (err) {
+    return funcWrap.reject(err)
+  })
+  .finally(function () {
+    that._processing = false
+    if (!that.length && that.emptyEvent) {
+      that.emptyEvent()
+    } else if (that.length) {
+      that._dequeue()
     }
+  })
+
+  if (that.dequeueEvent) {
+    that.dequeueEvent(funcWrap, that)
   }
 }
 
