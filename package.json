@@ -1,6 +1,6 @@
 {
   "name": "async-queue-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Simple and easy to use async queue",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
       "expect"
     ]
   },
-  "repository" : {
-    "url" : "https://github.com/KrasiNedew/async-queue-js"
+  "repository": {
+    "url": "https://github.com/KrasiNedew/async-queue-js"
   }
 }
